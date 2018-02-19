@@ -12,6 +12,15 @@ import (
 	"github.com/remeh/sizedwaitgroup"
 )
 
+func strHasPrefixInArray(str string, list []string) bool {
+	for _, v := range list {
+		if strings.HasPrefix(str, v) {
+			return true
+		}
+	}
+	return false
+}
+
 // sourceSanityCheck is a validation function that checks if the given source has all neccessary attributes (basedir, remote, SSH key exists if given)
 func sourceSanityCheck(source string, sa Source) {
 	if len(sa.PrivateKey) > 0 {
@@ -44,6 +53,8 @@ func resolvePuppetEnvironment(envBranch string) {
 			// check for a valid source that has all neccessary attributes (basedir, remote, SSH key exist if given)
 			sourceSanityCheck(source, sa)
 
+			allowedPrefixes := sa.allowedPrefixes
+
 			workDir := config.EnvCacheDir + source + ".git"
 			// check if sa.Basedir exists
 			checkDirAndCreate(sa.Basedir, "basedir")
@@ -58,7 +69,7 @@ func resolvePuppetEnvironment(envBranch string) {
 				for _, branch := range branches {
 					branch = strings.TrimLeft(branch, "* ")
 					// XXX: maybe make this user configurable (either with dedicated file or as YAML array in g10k config)
-					if strings.Contains(branch, ";") || strings.Contains(branch, "&") || strings.Contains(branch, "|") || strings.HasPrefix(branch, "tmp/") && strings.HasSuffix(branch, "/head") || (len(envBranch) > 0 && branch != envBranch) {
+					if strings.Contains(branch, ";") || strings.Contains(branch, "&") || strings.Contains(branch, "|") || strings.HasPrefix(branch, "tmp/") && strings.HasSuffix(branch, "/head") || (len(envBranch) > 0 && branch != envBranch) || strHasPrefixInArray(branch, allowedPrefixes) {
 						Debugf("Skipping branch " + branch)
 						continue
 					} else if len(envBranch) > 0 && branch == envBranch {
