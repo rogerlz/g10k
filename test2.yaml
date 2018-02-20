@@ -1,0 +1,17 @@
+---
+cachedir: /g10k/cache
+ignore_unreachable_modules: true
+
+git:
+  private_key: '/root/.ssh/id_rsa'
+  username: 'git'
+
+sources:
+  puppet:
+    basedir: /g10k/environments
+    remote: 'git@github.com:username/repository.git'
+    private_key: '/root/.ssh/id_rsa'
+    delete_skipped_branch: true
+    allowed_prefixes:
+      - production
+      - qa
