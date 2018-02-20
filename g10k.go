@@ -90,7 +90,7 @@ type Source struct {
 	ForceForgeVersions bool      `yaml:"force_forge_versions"`
 	WarnMissingBranch  bool      `yaml:"warn_if_branch_is_missing"`
 	ExitIfUnreachable  bool      `yaml:"exit_if_unreachable"`
-	allowedPrefixes    []string  `yaml:"allowed_prefixes"`
+	AllowedPrefixes    []string  `yaml:"allowed_prefixes"`
 }
 
 // Puppetfile contains the key value pairs from the Puppetfile

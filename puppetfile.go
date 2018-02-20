@@ -55,7 +55,7 @@ func resolvePuppetEnvironment(envBranch string) {
 			// check for a valid source that has all neccessary attributes (basedir, remote, SSH key exist if given)
 			sourceSanityCheck(source, sa)
 
-			allowedPrefixes := sa.allowedPrefixes
+			AllowedPrefixes := sa.AllowedPrefixes
 
 			workDir := config.EnvCacheDir + source + ".git"
 			// check if sa.Basedir exists
@@ -71,7 +71,7 @@ func resolvePuppetEnvironment(envBranch string) {
 				for _, branch := range branches {
 					branch = strings.TrimLeft(branch, "* ")
 					// XXX: maybe make this user configurable (either with dedicated file or as YAML array in g10k config)
-					if strings.Contains(branch, ";") || strings.Contains(branch, "&") || strings.Contains(branch, "|") || strings.HasPrefix(branch, "tmp/") && strings.HasSuffix(branch, "/head") || (len(envBranch) > 0 && branch != envBranch) || strHasPrefixInArray(branch, allowedPrefixes) {
+					if strings.Contains(branch, ";") || strings.Contains(branch, "&") || strings.Contains(branch, "|") || strings.HasPrefix(branch, "tmp/") && strings.HasSuffix(branch, "/head") || (len(envBranch) > 0 && branch != envBranch) || strHasPrefixInArray(branch, AllowedPrefixes) {
 						Debugf("Skipping branch " + branch)
 						continue
 					} else if len(envBranch) > 0 && branch == envBranch {
