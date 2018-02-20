@@ -13,9 +13,11 @@ import (
 )
 
 func strHasPrefixInArray(str string, list []string) bool {
-	for _, v := range list {
-		if strings.HasPrefix(str, v) {
-			return true
+	if len(list) > 0 {
+		for _, v := range list {
+			if strings.HasPrefix(str, v) {
+				return true
+			}
 		}
 	}
 	return false
