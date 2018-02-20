@@ -56,6 +56,7 @@ func resolvePuppetEnvironment(envBranch string) {
 			sourceSanityCheck(source, sa)
 
 			AllowedPrefixes := sa.AllowedPrefixes
+			DeleteSkippedBranch := sa.DeleteSkippedBranch
 
 			workDir := config.EnvCacheDir + source + ".git"
 			// check if sa.Basedir exists
@@ -67,12 +68,15 @@ func resolvePuppetEnvironment(envBranch string) {
 				er := executeCommand("git --git-dir "+workDir+" branch", config.Timeout, false)
 				branches := strings.Split(strings.TrimSpace(er.output), "\n")
 
+				var skippedBranches []string
+
 				foundBranch := false
 				for _, branch := range branches {
 					branch = strings.TrimLeft(branch, "* ")
 					// XXX: maybe make this user configurable (either with dedicated file or as YAML array in g10k config)
-					if strings.Contains(branch, ";") || strings.Contains(branch, "&") || strings.Contains(branch, "|") || strings.HasPrefix(branch, "tmp/") && strings.HasSuffix(branch, "/head") || (len(envBranch) > 0 && branch != envBranch) || strHasPrefixInArray(branch, AllowedPrefixes) {
+					if strings.Contains(branch, ";") || strings.Contains(branch, "&") || strings.Contains(branch, "|") || strings.HasPrefix(branch, "tmp/") && strings.HasSuffix(branch, "/head") || (len(envBranch) > 0 && branch != envBranch) || !strHasPrefixInArray(branch, AllowedPrefixes) {
 						Debugf("Skipping branch " + branch)
+						skippedBranches = append(skippedBranches, branch)
 						continue
 					} else if len(envBranch) > 0 && branch == envBranch {
 						foundBranch = true
@@ -107,6 +111,24 @@ func resolvePuppetEnvironment(envBranch string) {
 						}
 					}(branch)
 
+				}
+
+				if len(skippedBranches) > 0 && DeleteSkippedBranch == true {
+					for _, branch := range skippedBranches {
+						// copied from above
+						branchDir := sa.Basedir + sa.Prefix + "_" + strings.Replace(branch, "/", "_", -1)
+						if sa.Prefix == "false" || sa.Prefix == "" {
+							branchDir= sa.Basedir + strings.Replace(branch, "/", "_", -1)
+						} else if sa.Prefix == "true" {
+							branchDir= sa.Basedir + source + "_" + strings.Replace(branch, "/", "_", -1)
+						}
+						branchDir = normalizeDir(branchDir)
+
+						Debugf("Removing skipped branch " + branch + " (" + branchDir + ")")
+						if err := os.RemoveAll(branchDir); err != nil {
+							Debugf("Error while trying to remove skipped branch " + branchDir)
+						}
+					}
 				}
 
 				if sa.WarnMissingBranch && !foundBranch {

@@ -83,14 +83,15 @@ type Git struct {
 
 // Source contains basic information about a Puppet environment repository
 type Source struct {
-	Remote             string
-	Basedir            string
-	Prefix             string
-	PrivateKey         string    `yaml:"private_key"`
-	ForceForgeVersions bool      `yaml:"force_forge_versions"`
-	WarnMissingBranch  bool      `yaml:"warn_if_branch_is_missing"`
-	ExitIfUnreachable  bool      `yaml:"exit_if_unreachable"`
-	AllowedPrefixes    []string  `yaml:"allowed_prefixes"`
+	Remote              string
+	Basedir             string
+	Prefix              string
+	PrivateKey          string   `yaml:"private_key"`
+	ForceForgeVersions  bool     `yaml:"force_forge_versions"`
+	WarnMissingBranch   bool     `yaml:"warn_if_branch_is_missing"`
+	ExitIfUnreachable   bool     `yaml:"exit_if_unreachable"`
+	DeleteSkippedBranch bool     `yaml:"delete_skipped_branch"`
+	AllowedPrefixes     []string `yaml:"allowed_prefixes"`
 }
 
 // Puppetfile contains the key value pairs from the Puppetfile
